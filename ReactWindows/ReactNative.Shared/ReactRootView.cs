@@ -172,13 +172,15 @@ namespace ReactNative
         {
             DispatcherHelpers.AssertOnDispatcher(this);
 
+            TouchHandler.Dispose();
+
             var reactInstanceManager = _reactInstanceManager;
-            if (!_attachScheduled && reactInstanceManager != null)
+            var attachScheduled = _attachScheduled;
+            _attachScheduled = false;
+            if (!attachScheduled && reactInstanceManager != null)
             {
                 await reactInstanceManager.DetachRootViewAsync(this);
             }
-
-            _attachScheduled = false;
         }
 
         /// <summary>
@@ -242,11 +244,11 @@ namespace ReactNative
             _wasMeasured = true;
 
             var reactInstanceManager = _reactInstanceManager;
-            if (_attachScheduled && reactInstanceManager != null)
+            var attachScheduled = _attachScheduled;
+            _attachScheduled = false;
+            if (attachScheduled && reactInstanceManager != null)
             {
                 await reactInstanceManager.AttachMeasuredRootViewAsync(this);
-
-                _attachScheduled = false;
             }
         }
 
