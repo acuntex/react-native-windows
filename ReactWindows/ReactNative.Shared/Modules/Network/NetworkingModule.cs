@@ -37,8 +37,9 @@ namespace ReactNative.Modules.Network
     /// </summary>
     public class NetworkingModule : ReactContextNativeModuleBase
     {
+	    private static NetworkingModule _instance;
         private const int MaxChunkSizeBetweenFlushes = 8 * 1024; // 8kb
-        private readonly IHttpClient _client;
+        private IHttpClient _client;
         private readonly TaskCancellationManager<int> _tasks;
 
         private bool _shuttingDown;
@@ -60,8 +61,9 @@ namespace ReactNative.Modules.Network
         /// <param name="reactContext">The context.</param>
         internal NetworkingModule(IHttpClient client, ReactContext reactContext)
             : base(reactContext)
-        {
-            _client = client;
+		{
+			_instance = this;
+			_client = client;
             _tasks = new TaskCancellationManager<int>();
         }
 
@@ -520,5 +522,12 @@ namespace ReactNative.Modules.Network
                         AllowAutoRedirect = true,
                     }));
         }
+
+	    public static void ClearCookies()
+	    {
+		    if (_instance == null)
+			    return;
+		    _instance._client = CreateDefaultHttpClient();
+	    }
     }
 }
